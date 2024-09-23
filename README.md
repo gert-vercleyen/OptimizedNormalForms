@@ -1,2 +1,2 @@
 # OptimizedNormalForms
-Repository for the undergraduate research project on optimmizng the Hermite and Smith normal forms
+Repository for the undergraduate research project on optimizing the Hermite and Smith normal forms
