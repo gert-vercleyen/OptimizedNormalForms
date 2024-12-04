@@ -1,4 +1,22 @@
 using DelimitedFiles
+using Base.Cartesian
+using LinearAlgebra
+
+for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*))
+   @eval begin
+     @doc """
+         $($name)(z, a, b)
+         $($name)(a, b)
+ 
+     Return `a $($op) b`, possibly modifying the object `z` in the process.
+     Aliasing is permitted.
+     The two argument version is a shorthand for `$($name)(a, a, b)`.
+     """
+     $name(z, a, b) = $op(a, b)
+     $name(a, b) = $name(a, a, b)
+   end
+ end
+
 function nrows(A::Matrix{BigInt})
   return size(A, 1)
 end
@@ -8,25 +26,124 @@ function ncols(A::Matrix{BigInt})
 end
 
 function hnf_with_transform(A)
-  return hnf_kb_with_transform(A)
-end
-
-function hnf_kb_with_transform(A::Matrix{BigInt})
-   return _hnf_kb(A, Val(true))
-end
-
-function _hnf_kb(A, ::Val{with_transform} = Val(false)) where {with_transform}
    H = deepcopy(A)
-   m = nrows(H)
-   if with_transform
-      U =  Matrix{BigInt}(I, m, m)
-      hnf_kb!(H, U, true)
+   m = size(A, 1)
+   t1 = BigInt(0)
+   t2 = BigInt(0)
+   U =  Matrix{BigInt}(I, m, m)
+   n = size(A, 2)
+   pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i
+
+   row1, col1 = kb_search_first_pivot(H, 1)
+   if row1 == 0
       return H, U
-   else
-      U = Matrix{BigInt}(undef, 0, 0)
-      hnf_kb!(H, U, false)
+   end
+   pivot[col1] = row1
+   #kb_canonical_row!(H, U, row1, col1, with_trafo)
+   pivot_max = col1
+   for i = row1 + 1:m
+      new_pivot = false
+      for j = 1:n
+         if H[i, j] == 0
+            continue
+         end
+         if pivot[j] == 0
+            pivot[j] = i
+            pivot_max = max(pivot_max, j)
+            new_pivot = true
+         else
+            p = pivot[j]
+            d, u, v = gcdx(H[p, j], H[i, j])
+            a = H[p, j] / d
+            b = -H[i, j] / d
+            for c = j:n
+               t = deepcopy(H[i, c])
+               t1 = mul!(t1, a, H[i,c])
+               t2 = mul!(t2, b, H[p, c])
+               H[i, c] = t1 + t2
+               t1 = mul!(t1, u, H[p, c])
+               t2 = mul!(t2, v, t)
+               H[p, c] = t1 + t2
+            end
+            for c = 1:m
+               t = deepcopy(U[i, c])
+               t1 = mul!(t1, a, U[i, c])
+               t2 = mul!(t2, b, U[p, c])
+               U[i, c] = t1 + t2
+               t1 = mul!(t1, u, U[p, c])
+               t2 = mul!(t2, v, t)
+               U[p, c] = t1 + t2
+            end
+         end
+         for c = j:pivot_max
+            if pivot[c] == 0
+               continue
+            end
+            #kb_reduce_column!(H, U, pivot, c, with_trafo)
+         end
+         if new_pivot
+            break
+         end
+      end
+   end
+   #kb_sort_rows!(H, U, pivot, with_trafo, start_element)
+   return H, U
+end
+
+function hnf(A)
+   H = deepcopy(A)
+   m = size(A, 1)
+   n = size(A, 2)
+   pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i
+   row1, col1 = kb_search_first_pivot(H, 1)
+   if row1 == 0
       return H
    end
+   pivot[col1] = row1
+   #kb_canonical_row!(H, U, row1, col1, with_trafo)
+   pivot_max = col1
+   for i = row1 + 1:m
+      new_pivot = false
+      for j = 1:n
+         if H[i, j] == 0
+            continue
+         end
+         if pivot[j] == 0
+            pivot[j] = i
+            pivot_max = max(pivot_max, j)
+            new_pivot = true
+         else
+            p = pivot[j]
+            d, u, v = gcdx(H[p, j], H[i, j])
+            a = H[p, j] / d
+            b = -H[i, j] / d
+            for c = j:n
+               t = deepcopy(H[i, c])
+               t1 = mul!(t1, a, H[i,c])
+               #t1 = a * H[i, c]
+               t2 = mul!(t2, b, H[p, c])
+               #t2 = b * H[p, c]
+               H[i, c] = t1 + t2
+               t1 = mul!(t1, u, H[p, c])
+               #t1 = u * H[p,c]
+               t2 = mul!(t2, v, t)
+               #t2 = v * t
+               H[p, c] = t1 + t2
+            end
+         end
+         for c = j:pivot_max
+            if pivot[c] == 0
+               continue
+            end
+            #kb_reduce_column!(H, U, pivot, c, with_trafo)
+         end
+         if new_pivot
+            break
+         end
+      end
+   end
+   #kb_sort_rows!(H, U, pivot, with_trafo, start_element)
+   return H
 end
 
 function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
@@ -94,15 +211,6 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
                end
             end
          end
-         # We changed the pivot of column j (or found a new one).
-         # We have do reduce the entries marked with # in
-         # ( 0 0 0 . * )
-         # ( . # # * * )
-         # ( 0 0 . * * )
-         # ( 0 . # * * )
-         # ( * * * * * )
-         # where . are pivots and i = 4, j = 2. (This example is for the
-         # "new pivot" case.)
          kb_canonical_row!(H, U, pivot[j], j, with_trafo)
          for c = j:pivot_max
             if pivot[c] == 0
