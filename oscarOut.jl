@@ -27,11 +27,8 @@ end
 
 function hnf_with_transform(A)
    H = deepcopy(A)
-   m = size(A, 1)
-   t1 = BigInt(0)
-   t2 = BigInt(0)
-   U =  Matrix{BigInt}(I, m, m)
-   n = size(A, 2)
+   m, n = size(A)
+   U = Matrix{BigInt}(I, m, m)
    pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i
 
    row1, col1 = kb_search_first_pivot(H, 1)
@@ -41,6 +38,9 @@ function hnf_with_transform(A)
    pivot[col1] = row1
    #kb_canonical_row!(H, U, row1, col1, with_trafo)
    pivot_max = col1
+   t = BigInt(0)
+   t1 = BigInt(0)
+   t2 = BigInt(0)
    for i = row1 + 1:m
       new_pivot = false
       for j = 1:n
@@ -57,7 +57,7 @@ function hnf_with_transform(A)
             a = H[p, j] / d
             b = -H[i, j] / d
             for c = j:n
-               t = deepcopy(H[i, c])
+               t = H[i, c]
                t1 = mul!(t1, a, H[i,c])
                t2 = mul!(t2, b, H[p, c])
                H[i, c] = t1 + t2
@@ -66,7 +66,7 @@ function hnf_with_transform(A)
                H[p, c] = t1 + t2
             end
             for c = 1:m
-               t = deepcopy(U[i, c])
+               t = U[i, c]
                t1 = mul!(t1, a, U[i, c])
                t2 = mul!(t2, b, U[p, c])
                U[i, c] = t1 + t2
@@ -102,6 +102,7 @@ function hnf(A)
    pivot[col1] = row1
    #kb_canonical_row!(H, U, row1, col1, with_trafo)
    pivot_max = col1
+   t, t1, t2, p, d, u, v, a, b = BigInt(0)
    for i = row1 + 1:m
       new_pivot = false
       for j = 1:n
@@ -118,7 +119,7 @@ function hnf(A)
             a = H[p, j] / d
             b = -H[i, j] / d
             for c = j:n
-               t = deepcopy(H[i, c])
+               t = H[i, c]
                t1 = mul!(t1, a, H[i,c])
                #t1 = a * H[i, c]
                t2 = mul!(t2, b, H[p, c])
