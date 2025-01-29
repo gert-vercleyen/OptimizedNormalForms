@@ -7,7 +7,7 @@ for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*))
      @doc """
          $($name)(z, a, b)
          $($name)(a, b)
- 
+
      Return `a $($op) b`, possibly modifying the object `z` in the process.
      Aliasing is permitted.
      The two argument version is a shorthand for `$($name)(a, a, b)`.
@@ -25,7 +25,7 @@ function ncols(A::Matrix{BigInt})
    return size(A, 2)
 end
 
-function hnf_with_transform(A)
+function bigint_hnf_with_transform(A)
    H = deepcopy(A)
    m, n = size(A)
    U = Matrix{BigInt}(I, m, m)
