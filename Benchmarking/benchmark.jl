@@ -4,18 +4,19 @@ using TimerOutputs
 
 to = TimerOutput()
 
-linuxFileNames = readdlm("Benchmarking/FileNamesLinux",'\n',String)
+linuxFileNames = readdlm("/home/gert/Projects/OptimizedNormalForms/Benchmarking/FileNamesLinux",'\n',String)
 
-numMatrices = 30
+include("/home/gert/Projects/OptimizedNormalForms/oscarOut.jl")
 
-# for i in 1:numMatrices
-#   mat = matrix( ZZ, readdlm( "JULIA/" * linuxFileNames[i] ) );
-#   println(i);
-#   @timeit to linuxFileNames[i] snf_with_transform(mat);
-# end
+numMatrices = 15
 
-#show(to)
+for i in 1:numMatrices
+  mat = readdlm( "/home/gert/Projects/OptimizedNormalForms/JULIA/" * linuxFileNames[i] );
+  matZZ = matrix( ZZ, mat );
+  matBigInt = BigInt.(mat) 
+  println(i);
+  @timeit to string(i) * "_OSCAR"  hnf_with_transform(matZZ);
+  @timeit to string(i) * "_OwnBigInt" bigint_hnf_with_transform(matBigInt);
+end
 
-@time mat = matrix( ZZ, readdlm( "JULIA/" * linuxFileNames[30] ) );
-
-@profview_allocs snf_with_transform(mat) sample_rate=0.1
+show(to)
