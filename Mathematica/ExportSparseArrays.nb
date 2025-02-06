@@ -1,0 +1,270 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[     11946,        262]
+NotebookOptionsPosition[     10941,        237]
+NotebookOutlinePosition[     11357,        254]
+CellTagsIndexPosition[     11314,        251]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{"<<", "Anyonica`"}]], "Input",
+ CellChangeTimes->{{3.94776338812493*^9, 3.947763389568448*^9}},
+ CellLabel->"In[2]:=",ExpressionUUID->"fb36c7d3-6b07-4471-9829-598e0ad6c0c8"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"multFreeRings", " ", "=", " ", 
+   RowBox[{"Cases", "[", " ", 
+    RowBox[{"FRL", ",", " ", 
+     RowBox[{"r_", "/;", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Mult", "[", "r", "]"}], "==", "1"}], " ", "&&", 
+       RowBox[{
+        RowBox[{"Rank", "[", "r", "]"}], "<", "8"}], "&&", 
+       RowBox[{
+        RowBox[{"FusionCategories", "[", "r", "]"}], "=!=", 
+        RowBox[{"{", "}"}]}]}]}]}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.947763404056776*^9, 3.947763439593164*^9}, {
+  3.947764307476165*^9, 3.947764337197155*^9}},
+ CellLabel->"In[21]:=",ExpressionUUID->"816783ce-e620-4525-857f-580909538d1d"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Monitor", "[", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Table", "[", " ", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"r", " ", "=", " ", 
+        RowBox[{"multFreeRings", "[", 
+         RowBox[{"[", "i", "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"bpe", " ", "=", " ", 
+        RowBox[{"First", " ", "@", " ", 
+         RowBox[{"BinomialSplit", " ", "@", " ", 
+          RowBox[{"PentagonEquations", " ", "@", " ", "r"}]}]}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"fs", " ", "=", " ", 
+        RowBox[{"FSymbols", " ", "@", "r"}]}], ";", " ", 
+       "\[IndentingNewLine]", 
+       RowBox[{"symm", " ", "=", " ", 
+        RowBox[{"<|", " ", 
+         RowBox[{
+          RowBox[{"\"\<Transforms\>\"", " ", "->", " ", 
+           RowBox[{"Thread", "[", " ", 
+            RowBox[{"fs", " ", "->", " ", 
+             RowBox[{
+              RowBox[{"GaugeTransform", "[", "g", "]"}], "/@", "fs"}]}], " ", 
+            "]"}]}], ",", " ", 
+          RowBox[{"\"\<Symbols\>\"", " ", "->", " ", 
+           RowBox[{"{", "g", "}"}]}]}], " ", "|>"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"vacuumFs", " ", "=", 
+        RowBox[{"Cases", "[", " ", 
+         RowBox[{"fs", ",", " ", "$VacuumFPattern"}], " ", "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"fixedFs", " ", "=", " ", 
+        RowBox[{"BreakMultiplicativeSymmetry", "[", " ", 
+         RowBox[{"symm", ",", " ", 
+          RowBox[{"\"\<GaugeDemands\>\"", " ", "->", " ", 
+           RowBox[{"Thread", "[", " ", 
+            RowBox[{"vacuumFs", " ", "->", " ", "1"}], " ", "]"}]}]}], "  ", 
+         "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"bpe", " ", "=", " ", 
+        RowBox[{"bpe", "/.", 
+         RowBox[{"Dispatch", "[", "fixedFs", "]"}]}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"{", " ", 
+         RowBox[{
+         "simplerEqns", ",", " ", "simplerVars", ",", " ", "revertVars"}], 
+         " ", "}"}], " ", "=", " ", 
+        RowBox[{"SimplifyVariables", "[", " ", 
+         RowBox[{"bpe", ",", " ", 
+          RowBox[{"GetVariables", "[", 
+           RowBox[{"bpe", ",", "\[ScriptCapitalF]"}], "]"}], ",", " ", "x"}], 
+         " ", "]"}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"mat", " ", "=", 
+        RowBox[{"Check", "[", " ", 
+         RowBox[{
+          RowBox[{"First", " ", "@", " ", 
+           RowBox[{"BinToSemiLin", "[", " ", 
+            RowBox[{"simplerEqns", ",", " ", "simplerVars", ",", " ", "x"}], 
+            " ", "]"}]}], ",", 
+          RowBox[{"Print", "[", "r", "]"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"rules", " ", "=", " ", 
+        RowBox[{"Transpose", " ", "@", " ", 
+         RowBox[{"(", 
+          RowBox[{"Flatten", "/@", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"Most", "[", " ", 
+              RowBox[{"ArrayRules", " ", "@", "mat"}], "]"}], "/.", 
+             RowBox[{"Rule", " ", "->", " ", "List"}]}], ")"}]}], ")"}]}]}], ";",
+        "\[IndentingNewLine]", 
+       RowBox[{"Export", "[", 
+        RowBox[{
+         RowBox[{"\"\<~/Projects/OptimizedNormalForms/Mathematica/\
+SparseArrays/sparsemat_\>\"", "<>", 
+          RowBox[{"ToString", "[", "i", "]"}], "<>", "\"\<.dat\>\""}], ",", 
+         "rules"}], "]"}]}], "\[IndentingNewLine]", ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"{", 
+       RowBox[{"i", ",", "44", ",", 
+        RowBox[{"Length", " ", "@", " ", "multFreeRings"}]}], "}"}]}], 
+     "\[IndentingNewLine]", "]"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"Column", "[", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"ProgressIndicator", "[", 
+        RowBox[{"i", "/", 
+         RowBox[{"Length", "[", "multFreeRings", "]"}]}], "]"}], ",", " ", 
+       RowBox[{"multFreeRings", "[", 
+        RowBox[{"[", "i", "]"}], "]"}]}], "}"}], "  ", "]"}]}], 
+   "\[IndentingNewLine]", "]"}], "//", "Normal"}]], "Input",
+ CellChangeTimes->{{3.9477632760242777`*^9, 3.947763284350388*^9}, {
+  3.947763441643153*^9, 3.94776370938204*^9}, {3.947763782285069*^9, 
+  3.947763811039421*^9}, {3.947763951353425*^9, 3.947764274547233*^9}, {
+  3.947764366697994*^9, 3.9477643814868393`*^9}, {3.9477669755637817`*^9, 
+  3.947766977705887*^9}, {3.947767025328514*^9, 3.947767031938835*^9}, {
+  3.947767068599037*^9, 
+  3.947767075923297*^9}},ExpressionUUID->"ceae4a80-4d2e-4ce1-af95-\
+f04776524b9b"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "BinToSemiLin", "nonbineqns", 
+   "\"\\!\\(\\*RowBox[{\\\"{\\\", RowBox[{RowBox[{\\\"1\\\", \
+\\\"\[Equal]\\\", SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"1\\\", \
+\\\"]\\\"}], \\\"2\\\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+RowBox[{RowBox[{\\\"x\\\", \\\"[\\\", \\\"56\\\", \\\"]\\\"}], \\\" \\\", \
+RowBox[{\\\"x\\\", \\\"[\\\", \\\"57\\\", \\\"]\\\"}]}]}], \\\",\\\", \
+RowBox[{\\\"1\\\", \\\"\[Equal]\\\", RowBox[{RowBox[{\\\"x\\\", \\\"[\\\", \\\
+\"206\\\", \\\"]\\\"}], \\\" \\\", RowBox[{\\\"x\\\", \\\"[\\\", \\\"207\\\", \
+\\\"]\\\"}]}]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+RowBox[{RowBox[{\\\"x\\\", \\\"[\\\", \\\"399\\\", \\\"]\\\"}], \\\" \\\", \
+RowBox[{\\\"x\\\", \\\"[\\\", \\\"510\\\", \\\"]\\\"}], \\\" \\\", RowBox[{\\\
+\"x\\\", \\\"[\\\", \\\"511\\\", \\\"]\\\"}]}]}], \\\",\\\", \
+RowBox[{\\\"1\\\", \\\"\[Equal]\\\", RowBox[{RowBox[{\\\"x\\\", \\\"[\\\", \\\
+\"642\\\", \\\"]\\\"}], \\\" \\\", RowBox[{\\\"x\\\", \\\"[\\\", \\\"815\\\", \
+\\\"]\\\"}], \\\" \\\", RowBox[{\\\"x\\\", \\\"[\\\", \\\"816\\\", \
+\\\"]\\\"}]}]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+RowBox[{\\\"x\\\", \\\"[\\\", \\\"1\\\", \\\"]\\\"}]}], \\\",\\\", RowBox[{\\\
+\"1\\\", \\\"\[Equal]\\\", RowBox[{\\\"x\\\", \\\"[\\\", \\\"1\\\", \
+\\\"]\\\"}]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+RowBox[{\\\"x\\\", \\\"[\\\", \\\"1\\\", \\\"]\\\"}]}], \\\",\\\", RowBox[{\\\
+\"1\\\", \\\"\[Equal]\\\", RowBox[{\\\"x\\\", \\\"[\\\", \\\"1\\\", \
+\\\"]\\\"}]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"2\\\", \\\"]\\\"}], \
+\\\"2\\\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", RowBox[{\\\"x\\\
+\", \\\"[\\\", \\\"3\\\", \\\"]\\\"}]}], \\\",\\\", \
+RowBox[{RowBox[{\\\"x\\\", \\\"[\\\", \\\"1\\\", \\\"]\\\"}], \
+\\\"\[Equal]\\\", RowBox[{\\\"x\\\", \\\"[\\\", \\\"3\\\", \\\"]\\\"}]}], \
+\\\",\\\", RowBox[{\\\"\[LeftSkeleton]\\\", \\\"27\\\", \
+\\\"\[RightSkeleton]\\\"}], \\\",\\\", RowBox[{RowBox[{\\\"x\\\", \\\"[\\\", \
+\\\"1\\\", \\\"]\\\"}], \\\"\[Equal]\\\", RowBox[{\\\"x\\\", \\\"[\\\", \
+\\\"29\\\", \\\"]\\\"}]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"30\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"31\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"32\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"33\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"34\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"35\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"36\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"37\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"38\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"1\\\", \\\"\[Equal]\\\", \
+SuperscriptBox[RowBox[{\\\"x\\\", \\\"[\\\", \\\"39\\\", \\\"]\\\"}], \\\"2\\\
+\"]}], \\\",\\\", RowBox[{\\\"\[LeftSkeleton]\\\", \\\"12086\\\", \\\"\
+\[RightSkeleton]\\\"}]}], \\\"}\\\"}]\\) is not a system of binomial \
+polynomial equations.\"", 2, 23, 10, 33518714777292680677, "Kernobyl", 
+   "Anyonica`BinToSemiLin"},
+  "MessageTemplate2",
+  BaseStyle->"MSG"]], "Message",
+ CellChangeTimes->{3.947764546655759*^9, 3.947766985568469*^9, 
+  3.9477670464755087`*^9},
+ CellLabel->
+  "During evaluation of \
+In[23]:=",ExpressionUUID->"588926db-026e-4ee7-932e-fe2ffe632fc7"],
+
+Cell[BoxData["$Aborted"], "Output",
+ CellChangeTimes->{{3.947764004492353*^9, 3.947764041515723*^9}, {
+   3.947764109892535*^9, 3.947764162783915*^9}, 3.947764241251359*^9, 
+   3.947764302234879*^9, 3.947764546664274*^9, 3.947766985574566*^9, 
+   3.947767046480261*^9},
+ CellLabel->"Out[23]=",ExpressionUUID->"f04d388f-8fab-4a5c-b385-086aa37958ca"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"multFreeRings", "[", 
+  RowBox[{"[", "44", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.9477669459399776`*^9, 3.9477669489598293`*^9}},
+ CellLabel->"In[22]:=",ExpressionUUID->"47e8970a-ddc2-45a6-9376-da6979de1ab4"],
+
+Cell[BoxData[
+ RowBox[{"\<\"FR\"\>", 
+  "[", "\<\"\\!\\(\\*SubscriptBox[\\(\[DoubleStruckCapitalZ]\\), \
+\\(6\\)]\\)\"\>", "]"}]], "Output",
+ CellChangeTimes->{
+  3.947766949307551*^9, {3.947767005599975*^9, 3.947767026269413*^9}},
+ CellLabel->"Out[22]=",ExpressionUUID->"aa78785c-3425-4424-80a5-a9834ea45cc4"]
+}, Open  ]]
+},
+Evaluator->"Kernobyl",
+WindowSize->{1440, 744},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.2 for Linux x86 (64-bit) (December 26, 2024)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"88e5493c-6c82-4078-8f8c-c80efa1e54f5"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[554, 20, 196, 3, 44, "Input",ExpressionUUID->"fb36c7d3-6b07-4471-9829-598e0ad6c0c8"],
+Cell[753, 25, 659, 16, 46, "Input",ExpressionUUID->"816783ce-e620-4525-857f-580909538d1d"],
+Cell[CellGroupData[{
+Cell[1437, 45, 4522, 101, 742, "Input",ExpressionUUID->"ceae4a80-4d2e-4ce1-af95-f04776524b9b"],
+Cell[5962, 148, 4023, 62, 136, "Message",ExpressionUUID->"588926db-026e-4ee7-932e-fe2ffe632fc7"],
+Cell[9988, 212, 348, 5, 50, "Output",ExpressionUUID->"f04d388f-8fab-4a5c-b385-086aa37958ca"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[10373, 222, 239, 4, 46, "Input",ExpressionUUID->"47e8970a-ddc2-45a6-9376-da6979de1ab4"],
+Cell[10615, 228, 310, 6, 55, "Output",ExpressionUUID->"aa78785c-3425-4424-80a5-a9834ea45cc4"]
+}, Open  ]]
+}
+]
+*)
+
